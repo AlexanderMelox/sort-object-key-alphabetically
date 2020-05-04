@@ -1,12 +1,44 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Global, css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { motion } from 'framer-motion'
+import AceEditor from 'react-ace'
+import alphabetize from 'alphabetize-object-keys'
+import autoParse from 'auto-parse'
+import beautify from 'js-beautify'
 import 'bulma/css/bulma.min.css'
 
-import { Header } from './components'
+import 'ace-builds/src-noconflict/mode-javascript'
+import 'ace-builds/src-noconflict/theme-github'
+
+import { Header, Button } from './components'
 
 function App() {
+  const [value, setValue] = useState(`{
+  name: 'Cloud Strife',
+  birthPlace: 'Nibelheim',
+  age: 21,
+  height: '5 feet 7 inches'
+}
+  `)
+
+  const onEditorChange = (val) => {
+    console.log(typeof val)
+    setValue(val)
+  }
+
+  const alphabetizeThatShit = () => {
+    try {
+      const beautified = beautify(value)
+
+      JSON.parse(`{ "name": "Alex" }`, (key, value) => {
+        console.log({ key, value })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <>
       <Global
@@ -64,36 +96,74 @@ function App() {
           </span>
         </Lead>
         <TextareasContainer>
-          <Textarea className="box"></Textarea>
-          <Textarea className="box"></Textarea>
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 100,
+            }}
+            animate={{ opacity: 1, y: 0, transition: { delay: 0.6 } }}
+            whileHover={{
+              scale: 1.02,
+            }}
+          >
+            <Editor
+              width="1000px"
+              height="500px"
+              mode="javascript"
+              theme="github"
+              value={value}
+              onChange={onEditorChange}
+              name="sort-object-editor"
+              editorProps={{ $blockScrolling: true }}
+              className="box"
+            />
+          </motion.div>
+          <Button
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0, transition: { delay: 1 } }}
+            whileHover={{ y: -3, x: -3, scale: 1.01 }}
+            onClick={alphabetizeThatShit}
+          >
+            Alphabetize
+          </Button>
         </TextareasContainer>
       </StyledApp>
     </>
   )
 }
 
-const Textarea = styled.textarea`
+const Editor = styled(AceEditor)`
   background-color: #fff;
-  height: 500px;
-  width: 100%;
   resize: none;
   outline: none;
   border: none;
   border-radius: 0.3rem;
   padding: 1rem;
   font: inherit;
+  font-family: 'Source Code Pro', monospace;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 12px 12px 10px rgba(0, 0, 0, 0.2);
+  }
 `
 
 const TextareasContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 `
 
 const Lead = styled(motion.p)`
   text-align: center;
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  margin-top: -1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
 `
 
 const StyledApp = styled.div`
@@ -102,3 +172,22 @@ const StyledApp = styled.div`
 `
 
 export default App
+
+// {
+//   amountOfItemsToShow: PropTypes.number,
+//   bodyRow: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       clusters: PropTypes.number.isRequired,
+//       created: PropTypes.string.isRequired,
+//       region: PropTypes.string.isRequired,
+//       storage: PropTypes.string.isRequired,
+//     })
+//   ).isRequired,
+//   className: PropTypes.string,
+//   headerRow: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       key: PropTypes.string.isRequired,
+//       name: PropTypes.string.isRequired,
+//     }).isRequired
+//   ).isRequired,
+// }
